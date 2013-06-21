@@ -1,0 +1,53 @@
+#!/bin/bash
+# git pre-receive hook to deploy to uwsgi "emperor" mode
+
+
+set -e  # Stop if any command produces non-zero return status
+
+REPO=`pwd`
+PROJECT=`basename "$REPO" .git`
+COMMIT=
+
+while read LINE; do
+    NEW=`echo $LINE|cut -f2 -d' '`
+    REF=`echo $LINE|cut -f3 -d' '`
+    if [[ "$REF" == "refs/heads/master" ]]; then
+        COMMIT=`echo $NEW|cut -c1-6`
+    fi
+done
+
+if [[ "$COMMIT" == "" ]]; then
+    echo No update for master
+    exit 0
+fi
+
+WORKDIR=$HOME/$PROJECT-$COMMIT
+
+echo "Checking out $WORKDIR..."
+
+mkdir -p $WORKDIR
+git archive $COMMIT | tar -x -C $WORKDIR
+
+cd $WORKDIR
+source environment.sh
+chmod +x ./setup && ./setup
+
+URL=`$HOME/vassalconf test $PROJECT $COMMIT < uwsgi.ini`
+if [[ "$URL" == "" ]]; then
+    exit 1
+fi
+
+S=2
+while ! curl -s -f $URL >/dev/null; do
+    if [ $S -gt 10 ]; then
+        echo "Timeout"
+        $HOME/vassalconf rm $PROJECT $COMMIT
+        exit 1
+    fi
+    echo "Waiting for test server at $URL"
+    sleep $S
+    S=$(($S+1))
+done
+
+$HOME/vassalconf install $PROJECT $COMMIT < uwsgi.ini
+
