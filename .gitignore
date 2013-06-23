@@ -1,2 +1,4 @@
 /vassalconf
 *~
+*.pyc
+/example/pyenv/
