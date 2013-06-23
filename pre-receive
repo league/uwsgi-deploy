@@ -2,7 +2,8 @@
 # git pre-receive hook to deploy to uwsgi "emperor" mode
 
 # Path to compiled, setuid "vassalconf" program
-VASSALCONF=$HOME/uwsgi-deploy/vassalconf
+SELF=`readlink -f $0`
+DEPLOY=`dirname $SELF`/deploy-version
 
 # Stop if any command produces non-zero return status
 set -e
@@ -32,60 +33,6 @@ echo "Checking out $WORKDIR..."
 mkdir -p $WORKDIR
 git archive $COMMIT | tar -x -C $WORKDIR
 
-# Change to workdir, but also look for .deploy symlink
-cd $WORKDIR
-if [[ -L .deploy ]]; then
-    cd `readlink .deploy`
-fi
-
-# Read environment files, if they exist. First in workdir, then home.
-echo -n > vars-$COMMIT.txt
-
-read_environment_file() {
-    if [[ -r $1 ]]; then
-        echo Reading $1
-        source $1
-        egrep '^export [^= ]+=' $1 | cut -f2 -d' ' | cut -f1 -d= >> vars-$COMMIT.txt
-    fi
-}
-
-read_environment_file `pwd`/environment.sh
-read_environment_file $HOME/environment.sh
-
-# Run setup script
-echo "Running setup..."
-chmod +x ./setup && ./setup
-
-# Augment uwsgi with environment
-echo "Augmenting uwsgi.ini with environment..."
-echo "chdir = $PWD" >> uwsgi.ini
-for x in `sort vars-$COMMIT.txt|uniq`; do
-    echo "env = $x=${!x}" >> uwsgi.ini
-done
-
-# Create a test vassal
-URL=`$VASSALCONF test $PROJECT $COMMIT < uwsgi.ini`
-if [[ "$URL" == "" ]]; then
-    exit 1
-fi
-
-# Try to load the ping URL repeatedly
-S=2
-while ! curl -s -f $URL >/dev/null; do
-    if [ $S -gt 10 ]; then
-        echo "Timeout"
-        $VASSALCONF rm $PROJECT $COMMIT
-        exit 1
-    fi
-    echo "Waiting for test server at $URL"
-    sleep $S
-    S=$(($S+1))  # Increase delay
-done
-
-# Install for good
-echo "Looks good! Installing..."
-$VASSALCONF install $PROJECT $COMMIT < uwsgi.ini
-
-# Update symlink, log
-ln -sf $WORKDIR $HOME/$PROJECT
-echo "$PROJECT-$COMMIT@`date`" >> $HOME/deploy.log
+# Do it!
+$DEPLOY $WORKDIR
+date +"$PROJECT-$COMMIT %F %T" >> $HOME/deploy.log
