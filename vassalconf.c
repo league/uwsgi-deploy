@@ -15,7 +15,7 @@ int uninstall(char* name, char* version);
 int install(char* name, char* version);
 
 #define ETC_DIR "/etc/uwsgi/vassals"
-#define SOCK_DIR "/var/run/uwsgi"
+#define SOCK_DIR "/etc/uwsgi/run"
 #define BUF_SIZE 16384
 
 int main(int argc, char** argv)
