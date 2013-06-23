@@ -68,4 +68,5 @@ echo "Looks good! Installing..."
 $VASSALCONF install $PROJECT $COMMIT < uwsgi.ini
 
 # Update symlink
-ln -sf $1 $HOME/$PROJECT
+rm -f $HOME/$PROJECT
+ln -s $1 $HOME/$PROJECT
