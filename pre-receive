@@ -86,3 +86,6 @@ done
 echo "Looks good! Installing..."
 $VASSALCONF install $PROJECT $COMMIT < uwsgi.ini
 
+# Update symlink, log
+ln -sf $WORKDIR $HOME/$PROJECT
+echo "$PROJECT-$COMMIT@`date`" >> $HOME/deploy.log
