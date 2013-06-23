@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# deploy-cleanup -- remove all but the latest four deployed versions
+# deploy-cleanup -- remove all but the latest five deployed versions
 # from the file system
 
 import os
@@ -13,7 +13,7 @@ HOME=os.environ['HOME']
 # Read recent history from deploy.log
 log=open(os.path.join(HOME, 'deploy.log'), 'r')
 assert log
-entries = log.readlines()[-2:]
+entries = log.readlines()[-5:]
 log.close()
 
 # Just keep the dir names
