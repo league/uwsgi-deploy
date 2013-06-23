@@ -86,7 +86,7 @@ FILE* copy_ini_from_stdin(char* name, char* version)
 {
   char ini_path_buf[PATH_MAX];
   format_ini_pathname(ini_path_buf, name, version);
-  fprintf(stderr, "cat > %s\n", ini_path_buf);
+  fprintf(stderr, "Writing %s\n", ini_path_buf);
   FILE* ini = fopen(ini_path_buf, "w");
   assert(ini);
   char buf[BUF_SIZE];
@@ -111,7 +111,7 @@ int test(char* name, char* version)
 
 void symlink_or_abort(const char* oldpath, const char* newpath)
 {
-  fprintf(stderr, "ln -s %s %s\n", oldpath, newpath);
+  fprintf(stderr, "Linking %s -> %s\n", newpath, oldpath);
   int r = symlink(oldpath, newpath);
   if(r != 0) {
     perror("Error");
@@ -185,7 +185,7 @@ int uninstall(char* name, char* version)
 
   char ini_path_buf[PATH_MAX];
   format_ini_pathname(ini_path_buf, name, version);
-  fprintf(stderr, "rm %s\n", ini_path_buf);
+  fprintf(stderr, "Removing %s\n", ini_path_buf);
   r = unlink(ini_path_buf);
   if(r < 0) {                   /* continue on unlink error */
     perror("Warning");
