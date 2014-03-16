@@ -5,6 +5,9 @@
 SELF=`readlink -f $0`
 VASSALCONF=`dirname $SELF`/vassalconf
 
+# Make pip faster if we're using virtualenv
+export PIP_DOWNLOAD_CACHE=$HOME/.pip_download_cache
+
 # Stop if any command produces non-zero return status
 set -e
 
