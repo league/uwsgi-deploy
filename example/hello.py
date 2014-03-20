@@ -1,5 +1,4 @@
 import os
-from django import get_version
 
 def show_var(buf, v):
     buf.append(v)
@@ -10,7 +9,6 @@ def show_var(buf, v):
 def hello_world(environ, start_response):
     try:
         buf = ["Hello, world...!\n"]
-        buf.append('Django %s is available.\n' % get_version())
         show_var(buf, 'SOME_BIT_OF_CONFIG')
         show_var(buf, 'MY_SUPER_BIG_SECRET')
         start_response('200 OK', [('Content-Type', 'text/plain')])
