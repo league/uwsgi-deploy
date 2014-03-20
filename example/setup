@@ -2,3 +2,4 @@
 
 virtualenv pyenv
 source pyenv/bin/activate
+pip install Django
