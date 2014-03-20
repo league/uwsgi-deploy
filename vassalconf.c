@@ -103,7 +103,7 @@ int test(char* name, char* version)
 {
   FILE* ini = copy_ini_from_stdin(name, version);
   int port = rand() % 700 + 8100;
-  fprintf(ini, "\nsocket = localhost:%d\nprotocol = http\n", port);
+  fprintf(ini, "\nhttp-socket = localhost:%d\nprotocol = http\n", port);
   fclose(ini);
   printf("http://localhost:%d/ping\n", port);
   return 0;
