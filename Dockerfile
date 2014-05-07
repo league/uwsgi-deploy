@@ -23,6 +23,7 @@ RUN    chown -R www-data:www-data /var/www /etc/uwsgi/vassals /etc/uwsgi/run
 # Build AFTER chown, because it creates setuid executable
 RUN    make -C /var/www/uwsgi-deploy
 
+VOLUME /logs
 EXPOSE 22 80
 CMD    /usr/bin/supervisord
 
